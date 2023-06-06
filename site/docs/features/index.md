@@ -46,7 +46,7 @@ logical table (for example a `customers` or a `bank_account_transactions` table)
 consists of many data files.
 
 A common (mis)understanding of Data Lakes is "throw everything in and see
-what happens". This might work for some time, leaving data, especially large
+what happens". While this might work for some time, leaving data, especially large
 amounts of data, unorganized is a rather bad idea. A common best-practice
 is still to properly organize the (immutable) data files in directories that
 reflect both organizational (think: units/groups in your company) and
@@ -58,17 +58,17 @@ example: if you need to make changes to the data in data-file `A`, you
 basically have to read that data-file, apply the changes and write a new
 data-file `A'` with the changes, which makes data-file `A` irrelevant.
 
-The amount of data held in data lakes is rather huge (GBs, TBs, PBs), and so
-is the number of tables and data files (100s of thousands, millions).
+The amount of data held in data lakes can be huge (GBs, TBs, PBs), as can be the
+number of tables and data files (100s of thousands, millions).
 
 Managing that amount of data and data files while keeping track of schema
 changes, for example adding or removing a column, changing a column's type,
-renaming a column in a table and views, is one of the things that Nessie tackles.
+or renaming a column in a table and views, is one of the things that Nessie tackles.
 
 Data in a data lake is usually consumed and written using tools like
 Apache [Hive](https://hive.apache.org)[^2] or Apache
 [Spark](https://spark.apache.org)[^2]. Your existing jobs can easily integrate
-Nessie without any production code changes, it's a simple configuration change.
+Nessie without any production code changes: it's a simple configuration change.
 
 ## Git 101
 
@@ -104,11 +104,6 @@ the [About Git](https://git-scm.com/about) pages as a quick start.
 Each individual state in Nessie is defined by a *Nessie commit*.
 Each *commit* in Nessie, except the very first one, has references to its
 predecessor, the previous versions of the data.
-
-For those who know Git and merge-commits: One important difference of Nessie-merges
-is that Nessie-commits have only one parent (predecessor). Nessie-merge operations
-technically work a bit different: the changes in branch to be merged are replayed
-on top of the target branch.
 
 Each *Nessie commit* also indirectly "knows" about the data files (via some metadata)
 in your data lake, which represent the state of all data in all tables.
@@ -165,7 +160,7 @@ and so on.
 
 Relational database systems (RDBMS) for example usually provide certain levels of
 isolation (think: others cannot see uncommitted changes) and also ensure that either
-a change within a transaction succeeds, the request times out or fails straight
+a change within a transaction succeeds, the request times out, or it fails straight
 away. Relational databases have a single and central transaction-coordinator[^4]
 and are designed to always provide a consistent data set.
 
@@ -219,14 +214,14 @@ very latest version of our data.
 
 ### Working-branches for analytics jobs
 
-The above example with a single branch works well, if all changes to all tables
+The above example with a single branch works well if all changes to all tables
 can be grouped into a single commit. In a distributed world, computational work
 is distributed across many machines running many processes. All these individual
 tasks generate commits, but only the "sum" of all commits from all the tasks
 represents a consistent state.
 
 If all the tasks of a job would directly commit onto our "main" branch, the
-"main" branch would be *inconsistent* at least until not all tasks have finished.
+"main" branch would be *inconsistent* until all tasks have finished.
 Further, if the whole job fails, it would be hard to roll back the changes, especially
 if other jobs are running. Last but not least, the "main" branch would contain a
 lot of commits (for example `job#213, task#47346, add 1234 rows to table x`), which
@@ -300,11 +295,6 @@ into the "main"-branch.
 Technically, Nessie replays `commit #2` and `commit #3` on top of the most-recent
 commit of the "main" branch.
 
-For those who know Git and merge-commits: One important difference of Nessie-merges
-is that Nessie-commits have only one parent (predecessor). Nessie-merge operations
-technically work a bit different: the changes in branch to be merged are replayed
-on top of the target branch.
-
 It is recommended to give a commit a [meaningful commit message](./best-practices.md#commit-messages)
 and to let someone [review the changes](./best-practices.md#reviews).
 
@@ -326,7 +316,7 @@ Nessie can not yet squash commits.
 ### Tags
 
 Another type of named references are *tags*. Nessie *tags* are named references
-to specific commits. Tags do always point to the same commit and won't be changed
+to specific commits. Tags always point to the same commit and won't be changed
 automatically.
 
 This means, that *tags* are useful to reference specific commits, for example a tag
@@ -359,7 +349,7 @@ in the future.
 
 ## Garbage collection
 
-Data lakes contain a lot of data. The amount of data has a direct relation to
+Data lakes can contain a lot of data. The amount of data has a direct relation to
 the cost of ownership of a data lake. Keeping all data forever is probably going
 to be just too expensive, practically not useful and can also collide with data
 privacy regulations (for example GDPR or CCPA).
